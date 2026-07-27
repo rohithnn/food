@@ -409,11 +409,13 @@ def api_donations():
     ''').fetchall()
     return jsonify(items)
 
+# Auto-initialize database if it does not exist (essential for cloud platforms like Render)
+if not os.path.exists(database.DATABASE):
+    from init_db import seed_database
+    seed_database()
+
 if __name__ == '__main__':
-    # Initialize DB if not created yet
-    if not os.path.exists(database.DATABASE):
-        from init_db import seed_database
-        seed_database()
-        
-    print("Starting FoodBridge Flask Server on http://127.0.0.1:5000")
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    print(f"Starting FoodBridge Flask Server on http://127.0.0.1:{port}")
+    app.run(host='0.0.0.0', port=port, debug=True)
+
