@@ -88,9 +88,9 @@ Navigate to the project directory:
 cd d:\rohith\project\food
 ```
 
-### 2. Install Flask & Werkzeug (If not already installed)
+### 2. Install Dependencies
 ```bash
-pip install flask werkzeug
+pip install -r requirements.txt
 ```
 
 ### 3. Initialize the Database & Seed Demo Data
