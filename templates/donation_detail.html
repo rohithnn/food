@@ -8,8 +8,11 @@
 </div>
 
 <!-- Status Tracking Progress Bar Timeline -->
-<div style="background: white; border-radius: var(--radius-md); padding: 1.5rem; border: 1px solid var(--border-color); margin-bottom: 2rem; box-shadow: var(--shadow-sm);">
-    <h3 style="font-size: 1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;">Donation Status Lifecycle</h3>
+<div
+    style="background: white; border-radius: var(--radius-md); padding: 1.5rem; border: 1px solid var(--border-color); margin-bottom: 2rem; box-shadow: var(--shadow-sm);">
+    <h3
+        style="font-size: 1rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;">
+        Donation Status Lifecycle</h3>
     <div class="timeline">
         <!-- Step 1: Available -->
         <div class="timeline-step {% if donation.status in ['Available', 'Picked', 'Delivered'] %}completed{% endif %}">
@@ -18,7 +21,8 @@
         </div>
 
         <!-- Step 2: Picked -->
-        <div class="timeline-step {% if donation.status in ['Picked', 'Delivered'] %}completed{% elif donation.status == 'Picked' %}active{% endif %}">
+        <div
+            class="timeline-step {% if donation.status in ['Picked', 'Delivered'] %}completed{% elif donation.status == 'Picked' %}active{% endif %}">
             <div class="timeline-icon">2</div>
             <div class="timeline-label">Picked Up</div>
         </div>
@@ -32,41 +36,51 @@
 </div>
 
 <div style="display: grid; grid-template-columns: minmax(0, 1.8fr) minmax(0, 1.2fr); gap: 2rem;">
-    
+
     <!-- Left Column: Details & Action Buttons -->
     <div>
-        <div style="background: white; border-radius: var(--radius-lg); padding: 2rem; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
-            
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem;">
+        <div
+            style="background: white; border-radius: var(--radius-lg); padding: 2rem; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+
+            <div
+                style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 1rem;">
                 <div>
                     <span class="card-category" style="font-size: 0.85rem;">{{ donation.category }}</span>
                     <h1 style="font-size: 2.1rem; margin-top: 0.25rem;">{{ donation.food_name }}</h1>
                 </div>
 
                 {% if donation.status == 'Available' %}
-                    <span class="badge badge-available" style="font-size: 0.95rem; padding: 0.5rem 1rem;">
-                        <span class="pulse-dot"></span> Available
-                    </span>
+                <span class="badge badge-available" style="font-size: 0.95rem; padding: 0.5rem 1rem;">
+                    <span class="pulse-dot"></span> Available
+                </span>
                 {% elif donation.status == 'Picked' %}
-                    <span class="badge badge-picked" style="font-size: 0.95rem; padding: 0.5rem 1rem;">🟡 Picked Up</span>
+                <span class="badge badge-picked" style="font-size: 0.95rem; padding: 0.5rem 1rem;">🟡 Picked Up</span>
                 {% else %}
-                    <span class="badge badge-delivered" style="font-size: 0.95rem; padding: 0.5rem 1rem;">🔵 Delivered</span>
+                <span class="badge badge-delivered" style="font-size: 0.95rem; padding: 0.5rem 1rem;">🔵
+                    Delivered</span>
                 {% endif %}
             </div>
 
-            <div style="background: var(--bg-main); border-radius: var(--radius-md); padding: 1.25rem; margin: 1.5rem 0;">
+            <div
+                style="background: var(--bg-main); border-radius: var(--radius-md); padding: 1.25rem; margin: 1.5rem 0;">
                 <div class="form-row" style="row-gap: 1rem;">
                     <div>
-                        <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Quantity</div>
-                        <div style="font-weight: 700; font-size: 1.1rem; color: var(--text-main);">{{ donation.quantity }}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Quantity
+                        </div>
+                        <div style="font-weight: 700; font-size: 1.1rem; color: var(--text-main);">{{ donation.quantity
+                            }}</div>
                     </div>
                     <div>
-                        <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Best Before</div>
-                        <div style="font-weight: 700; font-size: 1.1rem; color: #d97706;">{{ donation.expiry_time }}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Best Before
+                        </div>
+                        <div style="font-weight: 700; font-size: 1.1rem; color: #d97706;">{{ donation.expiry_time }}
+                        </div>
                     </div>
                     <div>
-                        <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Posted Date</div>
-                        <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-main);">{{ donation.created_at[:16] }}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase;">Posted Date
+                        </div>
+                        <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-main);">{{
+                            donation.created_at[:16] }}</div>
                     </div>
                 </div>
             </div>
@@ -74,55 +88,64 @@
             <div style="margin-bottom: 1.75rem;">
                 <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">📍 Pickup Location</h3>
                 <p style="font-size: 1rem; color: var(--text-main);">{{ donation.location }}</p>
-                <a href="https://www.google.com/maps/search/?api=1&query={{ donation.latitude }},{{ donation.longitude }}" 
-                   target="_blank" class="btn btn-secondary btn-sm" style="margin-top: 0.6rem;">
+                <a href="https://www.google.com/maps/search/?api=1&query={{ donation.latitude }},{{ donation.longitude }}"
+                    target="_blank" class="btn btn-secondary btn-sm" style="margin-top: 0.6rem;">
                     🗺️ Open Directions on Google Maps ↗
                 </a>
             </div>
 
             {% if donation.notes %}
-                <div style="margin-bottom: 1.75rem;">
-                    <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">📝 Notes & Packaging</h3>
-                    <p style="font-size: 0.95rem; color: var(--text-muted); background: #f1f5f9; padding: 0.85rem 1rem; border-radius: var(--radius-sm);">
-                        {{ donation.notes }}
-                    </p>
-                </div>
+            <div style="margin-bottom: 1.75rem;">
+                <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">📝 Notes & Packaging</h3>
+                <p
+                    style="font-size: 0.95rem; color: var(--text-muted); background: #f1f5f9; padding: 0.85rem 1rem; border-radius: var(--radius-sm);">
+                    {{ donation.notes }}
+                </p>
+            </div>
             {% endif %}
 
             <!-- Dynamic NGO Actions & Status Transitions -->
             <div style="border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1.5rem;">
                 {% if current_user %}
-                    {% if current_user.role == 'ngo' %}
-                        {% if donation.status == 'Available' %}
-                            <form action="{{ url_for('claim_donation', donation_id=donation.id) }}" method="POST">
-                                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.9rem; font-size: 1.05rem;">
-                                    🤝 Accept Pickup for NGO
-                                </button>
-                            </form>
-                        {% elif donation.status == 'Picked' and (donation.ngo_id == current_user.id or not donation.ngo_id) %}
-                            <form action="{{ url_for('update_status', donation_id=donation.id) }}" method="POST">
-                                <input type="hidden" name="status" value="Delivered">
-                                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.9rem; background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
-                                    ✅ Mark as Successfully Delivered
-                                </button>
-                            </form>
-                        {% endif %}
-                    {% endif %}
+                {% if current_user.role == 'ngo' %}
+                {% if donation.status == 'Available' %}
+                <form action="{{ url_for('claim_donation', donation_id=donation.id) }}" method="POST">
+                    <button type="submit" class="btn btn-primary"
+                        style="width: 100%; padding: 0.9rem; font-size: 1.05rem;">
+                        🤝 Accept Pickup for NGO
+                    </button>
+                </form>
+                {% elif donation.status == 'Picked' and (donation.ngo_id == current_user.id or not donation.ngo_id) %}
+                <form action="{{ url_for('update_status', donation_id=donation.id) }}" method="POST">
+                    <input type="hidden" name="status" value="Delivered">
+                    <button type="submit" class="btn btn-primary"
+                        style="width: 100%; padding: 0.9rem; background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
+                        ✅ Mark as Successfully Delivered
+                    </button>
+                </form>
+                {% endif %}
+                {% endif %}
 
-                    <!-- Donor Action: Delete listing if available -->
-                    {% if current_user.role == 'donor' and donation.donor_id == current_user.id and donation.status == 'Available' %}
-                        <form action="{{ url_for('delete_donation', donation_id=donation.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this donation listing?');" style="margin-top: 0.75rem;">
-                            <button type="submit" class="btn btn-danger btn-sm" style="width: 100%;">
-                                🗑️ Delete Listing
-                            </button>
-                        </form>
-                    {% endif %}
+                <!-- Donor Action: Delete listing if available -->
+                {% if current_user.role == 'donor' and donation.donor_id == current_user.id and donation.status ==
+                'Available' %}
+                <form action="{{ url_for('delete_donation', donation_id=donation.id) }}" method="POST"
+                    onsubmit="return confirm('Are you sure you want to delete this donation listing?');"
+                    style="margin-top: 0.75rem;">
+                    <button type="submit" class="btn btn-danger btn-sm" style="width: 100%;">
+                        🗑️ Delete Listing
+                    </button>
+                </form>
+                {% endif %}
 
                 {% else %}
-                    <div style="text-align: center; background: var(--bg-main); padding: 1rem; border-radius: var(--radius-md);">
-                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Are you an NGO or Volunteer?</p>
-                        <a href="{{ url_for('login', next=request.url) }}" class="btn btn-primary btn-sm">Log in to Accept Pickup</a>
-                    </div>
+                <div
+                    style="text-align: center; background: var(--bg-main); padding: 1rem; border-radius: var(--radius-md);">
+                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Are you an NGO or
+                        Volunteer?</p>
+                    <a href="{{ url_for('login', next=request.url) }}" class="btn btn-primary btn-sm">Log in to Accept
+                        Pickup</a>
+                </div>
                 {% endif %}
             </div>
 
@@ -132,55 +155,66 @@
     <!-- Right Column: Map Pin & Contact Info Card -->
     <div>
         <!-- Single Location Map View -->
-        <div style="background: white; border-radius: var(--radius-lg); padding: 1.25rem; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); margin-bottom: 1.5rem;">
+        <div
+            style="background: white; border-radius: var(--radius-lg); padding: 1.25rem; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); margin-bottom: 1.5rem;">
             <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem;">Map Location</h3>
-            <div id="detail-map-container" style="height: 250px; border-radius: var(--radius-md); border: 1px solid var(--border-color);"></div>
+            <div id="detail-map-container"
+                style="height: 250px; border-radius: var(--radius-md); border: 1px solid var(--border-color);"></div>
         </div>
 
         <!-- Contact Cards -->
-        <div style="background: white; border-radius: var(--radius-lg); padding: 1.5rem; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
+        <div
+            style="background: white; border-radius: var(--radius-lg); padding: 1.5rem; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
             <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Contact Details</h3>
 
             <div style="margin-bottom: 1.25rem;">
                 <div style="font-size: 0.85rem; color: var(--text-muted);">Food Donor:</div>
                 <div style="font-weight: 700; font-size: 1.05rem;">{{ donation.donor_org or donation.donor_name }}</div>
                 {% if donation.donor_phone %}
-                    <div style="font-size: 0.9rem; color: var(--primary-hover); margin-top: 0.2rem;">
-                        📞 <a href="tel:{{ donation.donor_phone }}">{{ donation.donor_phone }}</a>
-                    </div>
+                <div style="font-size: 0.9rem; color: var(--primary-hover); margin-top: 0.2rem;">
+                    📞 <a href="tel:{{ donation.donor_phone }}">{{ donation.donor_phone }}</a>
+                </div>
                 {% endif %}
             </div>
 
             {% if donation.ngo_name %}
-                <div style="border-top: 1px dashed var(--border-color); padding-top: 1rem;">
-                    <div style="font-size: 0.85rem; color: var(--text-muted);">Claimed by NGO:</div>
-                    <div style="font-weight: 700; font-size: 1.05rem; color: var(--secondary-hover);">
-                        {{ donation.ngo_org or donation.ngo_name }}
-                    </div>
-                    {% if donation.ngo_phone %}
-                        <div style="font-size: 0.9rem; color: var(--secondary-hover); margin-top: 0.2rem;">
-                            📞 <a href="tel:{{ donation.ngo_phone }}">{{ donation.ngo_phone }}</a>
-                        </div>
-                    {% endif %}
+            <div style="border-top: 1px dashed var(--border-color); padding-top: 1rem;">
+                <div style="font-size: 0.85rem; color: var(--text-muted);">Claimed by NGO:</div>
+                <div style="font-weight: 700; font-size: 1.05rem; color: var(--secondary-hover);">
+                    {{ donation.ngo_org or donation.ngo_name }}
                 </div>
+                {% if donation.ngo_phone %}
+                <div style="font-size: 0.9rem; color: var(--secondary-hover); margin-top: 0.2rem;">
+                    📞 <a href="tel:{{ donation.ngo_phone }}">{{ donation.ngo_phone }}</a>
+                </div>
+                {% endif %}
+            </div>
             {% endif %}
         </div>
     </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const lat = {{ donation.latitude or 12.9716 }};
-    const lng = {{ donation.longitude or 77.5946 }};
-    
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. Safely parse latitude & longitude coordinates with fallback defaults
+        const lat = parseFloat({{ (donation.latitude or 12.9716) | tojson }});
+    const lng = parseFloat({{ (donation.longitude or 77.5946) | tojson }});
+
+    // 2. Initialize Leaflet map centered at the donation location
     const map = L.map('detail-map-container').setView([lat, lng], 14);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
     }).addTo(map);
-    
+
+    // 3. JSON-encode template variables for safe JavaScript usage
+    const foodName = {{ donation.food_name| tojson }};
+    const location = {{ donation.location| tojson }};
+
+    // 4. Create location pin marker with detailed popup
     L.marker([lat, lng]).addTo(map)
-        .bindPopup("<b>{{ donation.food_name|escape }}</b><br>{{ donation.location|escape }}")
+        .bindPopup(`<b>${foodName}</b><br>${location}`)
         .openPopup();
 });
 </script>
+
 {% endblock %}
