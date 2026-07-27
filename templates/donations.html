@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Food Donations - FoodBridge{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+        <h1 style="font-size: 2rem;">Food Donations Directory</h1>
+        <p style="color: var(--text-muted);">Real-time feed of available, claimed, and delivered food batches.</p>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; align-items: center;">
+        <button id="toggle-view-btn" class="btn btn-secondary btn-sm">
+            🗺️ Switch to Map View
+        </button>
+        {% if current_user and current_user.role == 'donor' %}
+            <a href="{{ url_for('add_donation') }}" class="btn btn-primary btn-sm">+ Add New Donation</a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Toolbar: Filter Tabs & Search Bar -->
+<div class="toolbar">
+    <div class="filter-tabs">
+        <a href="{{ url_for('donations', status='all', category=selected_category, q=search_query) }}" 
+           class="tab-btn {% if selected_status == 'all' %}active{% endif %}">
+            All ({{ counts.all }})
+        </a>
+        <a href="{{ url_for('donations', status='Available', category=selected_category, q=search_query) }}" 
+           class="tab-btn {% if selected_status == 'Available' %}active{% endif %}">
+            🟢 Available ({{ counts.Available }})
+        </a>
+        <a href="{{ url_for('donations', status='Picked', category=selected_category, q=search_query) }}" 
+           class="tab-btn {% if selected_status == 'Picked' %}active{% endif %}">
+            🟡 Picked ({{ counts.Picked }})
+        </a>
+        <a href="{{ url_for('donations', status='Delivered', category=selected_category, q=search_query) }}" 
+           class="tab-btn {% if selected_status == 'Delivered' %}active{% endif %}">
+            🔵 Delivered ({{ counts.Delivered }})
+        </a>
+    </div>
+
+    <form action="{{ url_for('donations') }}" method="GET" class="search-box">
+        <input type="hidden" name="status" value="{{ selected_status }}">
+        <input type="text" name="q" value="{{ search_query }}" class="form-control" placeholder="Search food, location..." style="font-size: 0.85rem;">
+        <button type="submit" class="btn btn-secondary btn-sm">Search</button>
+    </form>
+</div>
+
+<!-- Container 1: Cards View -->
+<div id="cards-view">
+    {% if donations %}
+        <div class="card-grid">
+            {% for item in donations %}
+                <div class="donation-card">
+                    <div>
+                        <div class="card-header">
+                            <span class="card-category">{{ item.category }}</span>
+                            {% if item.status == 'Available' %}
+                                <span class="badge badge-available"><span class="pulse-dot"></span> Available</span>
+                            {% elif item.status == 'Picked' %}
+                                <span class="badge badge-picked">🟡 Picked</span>
+                            {% else %}
+                                <span class="badge badge-delivered">🔵 Delivered</span>
+                            {% endif %}
+                        </div>
+
+                        <h3 class="card-title">{{ item.food_name }}</h3>
+                        
+                        <div style="margin: 1rem 0;">
+                            <div class="card-info-item">
+                                <span class="card-info-icon">📦</span>
+                                <span><strong>Quantity:</strong> {{ item.quantity }}</span>
+                            </div>
+                            <div class="card-info-item">
+                                <span class="card-info-icon">📍</span>
+                                <span><strong>Location:</strong> {{ item.location }}</span>
+                            </div>
+                            <div class="card-info-item">
+                                <span class="card-info-icon">⏳</span>
+                                <span><strong>Expiry:</strong> {{ item.expiry_time }}</span>
+                            </div>
+                            {% if item.notes %}
+                                <div class="card-info-item" style="font-size: 0.85rem; color: var(--text-light); margin-top: 0.4rem;">
+                                    <span class="card-info-icon">📝</span>
+                                    <span><em>"{{ item.notes|truncate(60) }}"</em></span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="donor-info">
+                            Donor: <strong>{{ item.donor_org or item.donor_name }}</strong>
+                            {% if item.ngo_name %}
+                                <br><span style="font-size: 0.75rem; color: var(--secondary-hover);">NGO: {{ item.ngo_org or item.ngo_name }}</span>
+                            {% endif %}
+                        </div>
+
+                        <a href="{{ url_for('donation_detail', donation_id=item.id) }}" class="btn btn-primary btn-sm">
+                            View Detail
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 4rem 2rem; background: white; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <div style="font-size: 3rem; margin-bottom: 0.5rem;">🔍</div>
+            <h3 style="margin-bottom: 0.5rem;">No Food Donations Found</h3>
+            <p style="color: var(--text-muted); max-width: 450px; margin: 0 auto 1.5rem;">
+                There are no donations matching your search criteria or status filter right now.
+            </p>
+            <a href="{{ url_for('donations', status='all') }}" class="btn btn-secondary btn-sm">Clear Filters</a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Container 2: Interactive Map View -->
+<div id="map-view" style="display: none;">
+    <div style="background: white; border-radius: var(--radius-md); padding: 1rem; border: 1px solid var(--border-color);">
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+            🗺️ Click on any pin on the map to see donation details and accept pickups.
+        </p>
+        <div id="donations-map"></div>
+    </div>
+</div>
+
+{% endblock %}

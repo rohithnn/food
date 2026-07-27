@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Register Account - FoodBridge{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem;">Join FoodBridge</h1>
+        <p style="color: var(--text-muted);">Create your account to start donating or receiving surplus food.</p>
+    </div>
+
+    <form action="{{ url_for('register') }}" method="POST">
+        <div class="form-group">
+            <label class="form-label">I am joining as a:</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <label style="border: 2px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; cursor: pointer; text-align: center; display: block;" id="role-donor-box">
+                    <input type="radio" name="role" value="donor" checked style="margin-right: 0.4rem;" onchange="updateRoleHighlight()">
+                    <strong>🏨 Donor</strong>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Hotel, Restaurant, Event</div>
+                </label>
+                <label style="border: 2px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; cursor: pointer; text-align: center; display: block;" id="role-ngo-box">
+                    <input type="radio" name="role" value="ngo" style="margin-right: 0.4rem;" onchange="updateRoleHighlight()">
+                    <strong>🤝 NGO / Volunteer</strong>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Shelter, Welfare Trust</div>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="name">Full Name / Primary Contact</label>
+            <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Sarah Jenkins" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="email">Email Address</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="e.g. contact@grandhotel.com" required>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="phone">Phone Number</label>
+                <input type="text" id="phone" name="phone" class="form-control" placeholder="e.g. +1 555-0199">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="organization">Organization Name</label>
+                <input type="text" id="organization" name="organization" class="form-control" placeholder="e.g. Grand Palace Hotel">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="At least 6 characters" minlength="6" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem; padding: 0.8rem;">
+            Create Account
+        </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+        Already registered? <a href="{{ url_for('login') }}" style="font-weight: 600;">Log in here</a>
+    </div>
+</div>
+
+<script>
+function updateRoleHighlight() {
+    const isDonor = document.querySelector('input[name="role"]:checked').value === 'donor';
+    const donorBox = document.getElementById('role-donor-box');
+    const ngoBox = document.getElementById('role-ngo-box');
+    
+    if (isDonor) {
+        donorBox.style.borderColor = 'var(--primary)';
+        donorBox.style.backgroundColor = 'var(--primary-light)';
+        ngoBox.style.borderColor = 'var(--border-color)';
+        ngoBox.style.backgroundColor = 'white';
+    } else {
+        ngoBox.style.borderColor = 'var(--secondary)';
+        ngoBox.style.backgroundColor = '#e0e7ff';
+        donorBox.style.borderColor = 'var(--border-color)';
+        donorBox.style.backgroundColor = 'white';
+    }
+}
+updateRoleHighlight();
+</script>
+{% endblock %}

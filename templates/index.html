@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}FoodBridge - Zero Waste Food Donation Network{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <h1 class="hero-title">Bridging <span>Surplus Food</span> to Hungry Hearts</h1>
+    <p class="hero-subtitle">
+        Connecting hotels, event planners, and restaurants with registered NGOs and local volunteers to eliminate food waste and ensure no meal goes to waste.
+    </p>
+
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        {% if current_user %}
+            {% if current_user.role == 'donor' %}
+                <a href="{{ url_for('add_donation') }}" class="btn btn-primary">+ Post Food Donation</a>
+            {% else %}
+                <a href="{{ url_for('donations') }}" class="btn btn-primary">Browse Available Food</a>
+            {% endif %}
+        {% else %}
+            <a href="{{ url_for('register') }}" class="btn btn-primary">Join as Donor or NGO</a>
+            <a href="{{ url_for('login') }}" class="btn btn-secondary" style="background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.3);">
+                Quick Demo Login
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Real-time Impact Statistics Grid -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_donations }}</div>
+            <div class="stat-label">Total Meal Batches</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" style="color: #60a5fa;">{{ stats.available }}</div>
+            <div class="stat-label">Ready for Pickup</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" style="color: #34d399;">{{ stats.delivered }}</div>
+            <div class="stat-label">Delivered Meals</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" style="color: #fbbf24;">{{ stats.donors + stats.ngos }}</div>
+            <div class="stat-label">Donors & NGOs Connected</div>
+        </div>
+    </div>
+</section>
+
+<!-- Active Food Listings Preview -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <div>
+        <h2>Available Food Near You</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">Freshly listed surplus meals awaiting NGO pickup acceptance.</p>
+    </div>
+    <a href="{{ url_for('donations') }}" class="btn btn-secondary btn-sm">View All Food →</a>
+</div>
+
+{% if recent_donations %}
+    <div class="card-grid">
+        {% for item in recent_donations %}
+            <div class="donation-card">
+                <div>
+                    <div class="card-header">
+                        <span class="card-category">{{ item.category }}</span>
+                        <span class="badge badge-available">
+                            <span class="pulse-dot"></span> Available
+                        </span>
+                    </div>
+
+                    <h3 class="card-title">{{ item.food_name }}</h3>
+                    
+                    <div style="margin: 0.85rem 0;">
+                        <div class="card-info-item">
+                            <span class="card-info-icon">📦</span>
+                            <span><strong>Quantity:</strong> {{ item.quantity }}</span>
+                        </div>
+                        <div class="card-info-item">
+                            <span class="card-info-icon">📍</span>
+                            <span><strong>Location:</strong> {{ item.location }}</span>
+                        </div>
+                        <div class="card-info-item">
+                            <span class="card-info-icon">⏳</span>
+                            <span><strong>Expiry:</strong> {{ item.expiry_time }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <div class="donor-info">
+                        Donor: <strong>{{ item.donor_org or item.donor_name }}</strong>
+                    </div>
+                    <a href="{{ url_for('donation_detail', donation_id=item.id) }}" class="btn btn-primary btn-sm">
+                        View & Claim
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div style="text-align: center; padding: 3rem; background: white; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+        <p style="font-size: 1.1rem; color: var(--text-muted);">No active food donations right now.</p>
+        {% if current_user and current_user.role == 'donor' %}
+            <a href="{{ url_for('add_donation') }}" class="btn btn-primary" style="margin-top: 1rem;">Post the First Donation</a>
+        {% endif %}
+    </div>
+{% endif %}
+
+<!-- How It Works Section -->
+<section style="margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border-color);">
+    <h2 style="text-align: center; margin-bottom: 2rem;">How FoodBridge Works</h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+        <div style="background: white; padding: 1.75rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🏨</div>
+            <h3 style="margin-bottom: 0.5rem;">1. Donor Posts Food</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Hotels, restaurants, or event organizers post excess untouched food with location, quantity, and expiry details.</p>
+        </div>
+        
+        <div style="background: white; padding: 1.75rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🛵</div>
+            <h3 style="margin-bottom: 0.5rem;">2. NGO Accepts Pickup</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Nearby NGOs or volunteers browse live listings, claim items, and view interactive maps to pick up food promptly.</p>
+        </div>
+        
+        <div style="background: white; padding: 1.75rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); text-align: center;">
+            <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🍲</div>
+            <h3 style="margin-bottom: 0.5rem;">3. Status Tracked & Delivered</h3>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Real-time status updates ensure transparency from Available to Picked to Delivered to community shelters.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

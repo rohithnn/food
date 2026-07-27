@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - FoodBridge{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+        <h1 style="font-size: 2rem;">
+            {% if current_user.role == 'donor' %}
+                Donor Activity Dashboard
+            {% else %}
+                NGO Pickup Dashboard
+            {% endif %}
+        </h1>
+        <p style="color: var(--text-muted);">
+            Logged in as <strong>{{ current_user.name }}</strong> ({{ current_user.organization or current_user.role|capitalize }})
+        </p>
+    </div>
+
+    {% if current_user.role == 'donor' %}
+        <a href="{{ url_for('add_donation') }}" class="btn btn-primary">+ Post Food Donation</a>
+    {% else %}
+        <a href="{{ url_for('donations') }}" class="btn btn-primary">Find Available Food</a>
+    {% endif %}
+</div>
+
+<!-- Dashboard Quick Stats Bar -->
+<div class="stats-grid" style="margin-bottom: 2rem;">
+    {% if current_user.role == 'donor' %}
+        <div class="stat-card" style="background: white; border: 1px solid var(--border-color);">
+            <div class="stat-number" style="color: var(--primary);">{{ stats.total_posted }}</div>
+            <div class="stat-label" style="color: var(--text-muted);">Total Posted</div>
+        </div>
+        <div class="stat-card" style="background: white; border: 1px solid var(--border-color);">
+            <div class="stat-number" style="color: #60a5fa;">{{ stats.available }}</div>
+            <div class="stat-label" style="color: var(--text-muted);">Currently Available</div>
+        </div>
+        <div class="stat-card" style="background: white; border: 1px solid var(--border-color);">
+            <div class="stat-number" style="color: #f59e0b;">{{ stats.picked }}</div>
+            <div class="stat-label" style="color: var(--text-muted);">In Transit</div>
+        </div>
+        <div class="stat-card" style="background: white; border: 1px solid var(--border-color);">
+            <div class="stat-number" style="color: #10b981;">{{ stats.delivered }}</div>
+            <div class="stat-label" style="color: var(--text-muted);">Delivered</div>
+        </div>
+    {% else %}
+        <div class="stat-card" style="background: white; border: 1px solid var(--border-color);">
+            <div class="stat-number" style="color: var(--secondary);">{{ stats.total_claimed }}</div>
+            <div class="stat-label" style="color: var(--text-muted);">Total Claimed Pickups</div>
+        </div>
+        <div class="stat-card" style="background: white; border: 1px solid var(--border-color);">
+            <div class="stat-number" style="color: #f59e0b;">{{ stats.active_pickups }}</div>
+            <div class="stat-label" style="color: var(--text-muted);">Active Pickups</div>
+        </div>
+        <div class="stat-card" style="background: white; border: 1px solid var(--border-color);">
+            <div class="stat-number" style="color: #10b981;">{{ stats.completed_deliveries }}</div>
+            <div class="stat-label" style="color: var(--text-muted);">Completed Deliveries</div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- List Section -->
+<h2 style="font-size: 1.4rem; margin-bottom: 1rem;">
+    {% if current_user.role == 'donor' %}My Posted Food Donations{% else %}My Accepted Pickups{% endif %}
+</h2>
+
+{% if donations %}
+    <div style="background: white; border-radius: var(--radius-md); border: 1px solid var(--border-color); overflow: hidden; box-shadow: var(--shadow-sm);">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem;">
+            <thead>
+                <tr style="background: var(--bg-main); border-bottom: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase;">
+                    <th style="padding: 1rem;">Food Item</th>
+                    <th style="padding: 1rem;">Quantity</th>
+                    <th style="padding: 1rem;">Location</th>
+                    <th style="padding: 1rem;">Status</th>
+                    <th style="padding: 1rem; text-align: right;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in donations %}
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td style="padding: 1rem;">
+                            <strong>{{ item.food_name }}</strong>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">{{ item.category }}</div>
+                        </td>
+                        <td style="padding: 1rem;">{{ item.quantity }}</td>
+                        <td style="padding: 1rem; color: var(--text-muted);">{{ item.location|truncate(35) }}</td>
+                        <td style="padding: 1rem;">
+                            {% if item.status == 'Available' %}
+                                <span class="badge badge-available">🟢 Available</span>
+                            {% elif item.status == 'Picked' %}
+                                <span class="badge badge-picked">🟡 Picked</span>
+                            {% else %}
+                                <span class="badge badge-delivered">🔵 Delivered</span>
+                            {% endif %}
+                        </td>
+                        <td style="padding: 1rem; text-align: right;">
+                            <a href="{{ url_for('donation_detail', donation_id=item.id) }}" class="btn btn-secondary btn-sm">
+                                View / Manage
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div style="text-align: center; padding: 3rem; background: white; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+        <p style="color: var(--text-muted); font-size: 1.05rem;">No items found in your dashboard yet.</p>
+        {% if current_user.role == 'donor' %}
+            <a href="{{ url_for('add_donation') }}" class="btn btn-primary btn-sm" style="margin-top: 0.75rem;">Post Your First Donation</a>
+        {% else %}
+            <a href="{{ url_for('donations') }}" class="btn btn-primary btn-sm" style="margin-top: 0.75rem;">Browse Available Food</a>
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}

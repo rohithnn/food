@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Log In - FoodBridge{% endblock %}
+
+{% block content %}
+<div class="form-card">
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem;">Welcome Back</h1>
+        <p style="color: var(--text-muted);">Sign in to manage food donations or accept pickups.</p>
+    </div>
+
+    <!-- Quick Demo Accounts Banner for rapid testing -->
+    <div style="background-color: var(--primary-light); border: 1px solid #a7f3d0; border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.75rem;">
+        <p style="font-size: 0.85rem; font-weight: 700; color: #047857; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;">⚡ Quick Demo Login Credentials:</p>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="fillDemo('donor@grandhotel.com', 'password123')">
+                🏨 Demo Donor (Grand Hotel)
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="fillDemo('ngo@foodcare.org', 'password123')">
+                🤝 Demo NGO (FoodCare)
+            </button>
+        </div>
+    </div>
+
+    <form action="{{ url_for('login', next=request.args.get('next')) }}" method="POST">
+        <div class="form-group">
+            <label class="form-label" for="email">Email Address</label>
+            <input type="email" id="email" name="email" class="form-control" placeholder="e.g. donor@grandhotel.com" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem; padding: 0.8rem;">
+            Log In to Account
+        </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+        Don't have an account yet? <a href="{{ url_for('register') }}" style="font-weight: 600;">Register here</a>
+    </div>
+</div>
+
+<script>
+function fillDemo(email, pass) {
+    document.getElementById('email').value = email;
+    document.getElementById('password').value = pass;
+}
+</script>
+{% endblock %}
