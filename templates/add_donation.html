@@ -1,74 +1,142 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block title %}Post Food Donation - FoodBridge{% endblock %}
+{% block title %}Post New Food Donation - FoodBridge MVP 2.0{% endblock %}
 
 {% block content %}
 <div class="form-card">
-    <div style="margin-bottom: 1.75rem;">
-        <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem;">Post Food Donation</h1>
-        <p style="color: var(--text-muted);">Share details about your surplus food so local NGOs can arrange pickup.</p>
+    <div style="margin-bottom: 1.5rem; text-align: center;">
+        <h1 style="font-size: 1.8rem; color: var(--text-main);">🍱 Post Surplus Food Donation</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">Provide details about your surplus food to automatically match with nearby verified NGOs.</p>
     </div>
 
-    <form action="{{ url_for('add_donation') }}" method="POST">
+    <form method="POST" action="{{ url_for('add_donation') }}" enctype="multipart/form-data">
         <div class="form-group">
             <label class="form-label" for="food_name">Food Name / Description *</label>
-            <input type="text" id="food_name" name="food_name" class="form-control" 
-                   placeholder="e.g. Surplus Buffet Rice & Veggie Curry" required>
+            <input type="text" id="food_name" name="food_name" class="form-control" placeholder="e.g. Surplus Buffet Biryani, Veg Gravy & Sweets" required>
         </div>
 
         <div class="form-row">
             <div class="form-group">
-                <label class="form-label" for="quantity">Quantity *</label>
-                <input type="text" id="quantity" name="quantity" class="form-control" 
-                       placeholder="e.g. 50 Portions / 20 kg" required>
+                <label class="form-label" for="food_type">Food Type *</label>
+                <select id="food_type" name="food_type" class="form-control" required>
+                    <option value="Veg">🌱 Pure Vegetarian (Veg)</option>
+                    <option value="Non-Veg">🍗 Non-Vegetarian (Non-Veg)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="servings_count">Estimated Servings (People Count) *</label>
+                <input type="number" id="servings_count" name="servings_count" class="form-control" placeholder="e.g. 150" value="50" min="1" required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="quantity">Quantity Label (Meals/Kg) *</label>
+                <input type="text" id="quantity" name="quantity" class="form-control" placeholder="e.g. 150 Portions (~45 kg)" required>
             </div>
 
             <div class="form-group">
                 <label class="form-label" for="category">Category</label>
                 <select id="category" name="category" class="form-control">
-                    <option value="Prepared Meals">Prepared Meals</option>
-                    <option value="Bakery Items">Bakery & Pastries</option>
-                    <option value="Fresh Produce">Fresh Fruits & Veggies</option>
-                    <option value="Packaged Foods">Packaged / Dry Goods</option>
-                    <option value="Beverages">Beverages</option>
+                    <option value="Prepared Meals">Prepared Meals / Banquet</option>
+                    <option value="Bakery Items">Bakery & Bread Items</option>
+                    <option value="Fresh Produce">Fresh Produce / Fruits</option>
+                    <option value="Packaged Foods">Packaged Foods / Groceries</option>
+                    <option value="Other">Other Food Items</option>
                 </select>
             </div>
         </div>
 
         <div class="form-group">
-            <label class="form-label" for="expiry_time">Best Before / Expiry Time *</label>
-            <input type="text" id="expiry_time" name="expiry_time" class="form-control" 
-                   placeholder="e.g. Today by 10:30 PM (Prepared 2 hours ago)" required>
+            <label class="form-label" for="pickup_deadline">Pickup Deadline / Expiry *</label>
+            <input type="text" id="pickup_deadline" name="pickup_deadline" class="form-control" placeholder="e.g. Today by 10:30 PM (Freshly prepared)" required>
         </div>
 
         <div class="form-group">
-            <label class="form-label" for="location">Pickup Address / Landmark *</label>
-            <input type="text" id="location" name="location" class="form-control" 
-                   placeholder="e.g. Grand Hotel Kitchen Gate 3, MG Road" required>
+            <label class="form-label" for="location">Pickup Address / Location *</label>
+            <input type="text" id="location" name="location" class="form-control" placeholder="e.g. MG Road Grand Hotel, Central City Loading Dock 2" required>
         </div>
 
-        <!-- Interactive Map Location Pin Picker -->
         <div class="form-group">
-            <label class="form-label">📍 Pin Location on Map (Click or Drag Marker):</label>
-            <div id="location-picker-map" class="picker-map"></div>
-            <div style="display: flex; gap: 1rem; margin-top: 0.5rem;">
-                <input type="hidden" id="latitude" name="latitude" value="12.9716">
-                <input type="hidden" id="longitude" name="longitude" value="77.5946">
+            <label class="form-label" for="food_image">Food Photo Upload (Optional)</label>
+            <input type="file" id="food_image" name="food_image" class="form-control" accept="image/*">
+            <small style="color: var(--text-muted);">Upload a clear photo of the prepared food packaging.</small>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="special_instructions">Special Pickup Instructions</label>
+            <textarea id="special_instructions" name="special_instructions" class="form-control" rows="2" placeholder="e.g. Use service elevator at rear loading dock. Ask for Manager on arrival."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="notes">Additional Quality & Storage Notes</label>
+            <textarea id="notes" name="notes" class="form-control" rows="2" placeholder="e.g. Packed in food-grade insulated thermal containers. Keeps hot for 4 hours."></textarea>
+        </div>
+
+        <!-- Smart Capacity Splitting Option -->
+        <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.5rem;">
+            <label style="display: flex; align-items: flex-start; gap: 0.75rem; cursor: pointer;">
+                <input type="checkbox" name="auto_split" value="1" checked style="margin-top: 0.2rem; width: 18px; height: 18px;">
+                <div>
+                    <strong style="color: #065f46; font-size: 0.95rem;">🤖 Enable Smart NGO Capacity Auto-Splitting</strong>
+                    <p style="font-size: 0.85rem; color: #047857; margin-top: 0.2rem;">
+                        If enabled, bulk donations (e.g. 500 meals) will be automatically split across multiple nearby NGOs according to each NGO's daily capacity and max pickup limits!
+                    </p>
+                </div>
+            </label>
+        </div>
+
+        <!-- Map Location Picker -->
+        <div class="form-group">
+            <label class="form-label">Set Pickup Coordinates on Map</label>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">Drag the pin to set precise location coordinates for nearby NGO matching.</p>
+            
+            <div id="picker-map" class="picker-map"></div>
+            
+            <div class="form-row" style="margin-top: 0.75rem;">
+                <div>
+                    <label class="form-label" for="latitude" style="font-size: 0.8rem;">Latitude</label>
+                    <input type="text" id="latitude" name="latitude" class="form-control" value="12.9716" readonly>
+                </div>
+                <div>
+                    <label class="form-label" for="longitude" style="font-size: 0.8rem;">Longitude</label>
+                    <input type="text" id="longitude" name="longitude" class="form-control" value="77.5946" readonly>
+                </div>
             </div>
         </div>
 
-        <div class="form-group">
-            <label class="form-label" for="notes">Additional Instructions / Packaging Notes</label>
-            <textarea id="notes" name="notes" class="form-control" rows="3" 
-                      placeholder="e.g. Packed in food-grade foil trays. Please enter via service alley."></textarea>
-        </div>
-
-        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-            <button type="submit" class="btn btn-primary" style="flex: 1; padding: 0.8rem;">
-                Publish Food Donation
-            </button>
-            <a href="{{ url_for('donations') }}" class="btn btn-secondary" style="padding: 0.8rem 1.5rem;">Cancel</a>
+        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 1;">Publish Food Donation</button>
+            <a href="{{ url_for('donations') }}" class="btn btn-secondary">Cancel</a>
         </div>
     </form>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const map = L.map('picker-map').setView([12.9716, 77.5946], 13);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    let marker = L.marker([12.9716, 77.5946], { draggable: true }).addTo(map);
+
+    function updateCoords(lat, lng) {
+        document.getElementById('latitude').value = lat.toFixed(6);
+        document.getElementById('longitude').value = lng.toFixed(6);
+    }
+
+    marker.on('dragend', function(e) {
+        const coord = e.target.getLatLng();
+        updateCoords(coord.lat, coord.lng);
+    });
+
+    map.on('click', function(e) {
+        marker.setLatLng(e.latlng);
+        updateCoords(e.latlng.lat, e.latlng.lng);
+    });
+});
+</script>
 {% endblock %}

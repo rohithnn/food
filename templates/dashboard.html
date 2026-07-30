@@ -1,117 +1,158 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block title %}Dashboard - FoodBridge{% endblock %}
+{% block title %}User Dashboard - FoodBridge MVP 2.0{% endblock %}
 
 {% block content %}
-<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.75rem; flex-wrap: wrap; gap: 1rem;">
+<div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
     <div>
-        <h1 style="font-size: 2rem;">
-            {% if current_user.role == 'donor' %}
-                Donor Activity Dashboard
-            {% else %}
-                NGO Pickup Dashboard
-            {% endif %}
-        </h1>
+        <h1 style="font-size: 2rem; color: var(--text-main);">📋 User Dashboard</h1>
         <p style="color: var(--text-muted);">
-            Logged in as <strong>{{ current_user.name }}</strong> ({{ current_user.organization or current_user.role|capitalize }})
+            Welcome, <strong>{{ current_user.name }}</strong> ({{ current_user.organization or current_user.role|capitalize }}).
         </p>
     </div>
 
     {% if current_user.role == 'donor' %}
-        <a href="{{ url_for('add_donation') }}" class="btn btn-primary">+ Post Food Donation</a>
-    {% else %}
-        <a href="{{ url_for('donations') }}" class="btn btn-primary">Find Available Food</a>
+        <a href="{{ url_for('add_donation') }}" class="btn btn-primary">
+            + Post New Food Donation
+        </a>
+    {% elif current_user.role == 'ngo' %}
+        <a href="{{ url_for('ngo_capacity') }}" class="btn btn-accent">
+            📊 Configure Capacity Settings
+        </a>
     {% endif %}
 </div>
 
-<!-- Dashboard Quick Stats Bar -->
-<div class="stats-grid" style="margin-bottom: 2rem;">
-    {% if current_user.role == 'donor' %}
-        <div class="stat-card" style="background: white; border: 1px solid var(--border-color);">
+<!-- DONOR DASHBOARD VIEW -->
+{% if current_user.role == 'donor' %}
+    <!-- Donor Impact Counters -->
+    <div class="stats-grid" style="margin-bottom: 2rem;">
+        <div class="stat-card" style="background: white; border: 1px solid var(--border-color); color: var(--text-main);">
             <div class="stat-number" style="color: var(--primary);">{{ stats.total_posted }}</div>
-            <div class="stat-label" style="color: var(--text-muted);">Total Posted</div>
+            <div class="stat-label" style="color: var(--text-muted);">Total Listings Posted</div>
         </div>
-        <div class="stat-card" style="background: white; border: 1px solid var(--border-color);">
-            <div class="stat-number" style="color: #60a5fa;">{{ stats.available }}</div>
+        <div class="stat-card" style="background: white; border: 1px solid var(--border-color); color: var(--text-main);">
+            <div class="stat-number" style="color: #6366f1;">{{ stats.total_servings_saved }}</div>
+            <div class="stat-label" style="color: var(--text-muted);">Meals Saved</div>
+        </div>
+        <div class="stat-card" style="background: white; border: 1px solid var(--border-color); color: var(--text-main);">
+            <div class="stat-number" style="color: #f59e0b;">{{ stats.available }}</div>
             <div class="stat-label" style="color: var(--text-muted);">Currently Available</div>
         </div>
-        <div class="stat-card" style="background: white; border: 1px solid var(--border-color);">
-            <div class="stat-number" style="color: #f59e0b;">{{ stats.picked }}</div>
-            <div class="stat-label" style="color: var(--text-muted);">In Transit</div>
-        </div>
-        <div class="stat-card" style="background: white; border: 1px solid var(--border-color);">
+        <div class="stat-card" style="background: white; border: 1px solid var(--border-color); color: var(--text-main);">
             <div class="stat-number" style="color: #10b981;">{{ stats.delivered }}</div>
-            <div class="stat-label" style="color: var(--text-muted);">Delivered</div>
+            <div class="stat-label" style="color: var(--text-muted);">Completed Pickups</div>
+        </div>
+    </div>
+
+    <!-- Posted Donations List -->
+    <h2 style="font-size: 1.3rem; margin-bottom: 1rem;">🍱 My Posted Food Listings</h2>
+    {% if donations %}
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Food Item</th>
+                        <th>Type</th>
+                        <th>Quantity / Servings</th>
+                        <th>Pickup Deadline</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in donations %}
+                        <tr>
+                            <td><strong>{{ d.food_name }}</strong></td>
+                            <td>
+                                <span class="badge {% if d.food_type == 'Veg' %}badge-veg{% else %}badge-nonveg{% endif %}">
+                                    {{ d.food_type or 'Veg' }}
+                                </span>
+                            </td>
+                            <td>{{ d.quantity }} ({{ d.servings_count or 50 }} Servings)</td>
+                            <td>{{ d.pickup_deadline }}</td>
+                            <td>
+                                <span class="badge badge-{{ d.status|lower|replace(' ', '') }}">
+                                    {{ d.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('donation_detail', donation_id=d.id) }}" class="btn btn-secondary btn-sm">
+                                    View / Split Progress &rarr;
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     {% else %}
-        <div class="stat-card" style="background: white; border: 1px solid var(--border-color);">
-            <div class="stat-number" style="color: var(--secondary);">{{ stats.total_claimed }}</div>
-            <div class="stat-label" style="color: var(--text-muted);">Total Claimed Pickups</div>
-        </div>
-        <div class="stat-card" style="background: white; border: 1px solid var(--border-color);">
-            <div class="stat-number" style="color: #f59e0b;">{{ stats.active_pickups }}</div>
-            <div class="stat-label" style="color: var(--text-muted);">Active Pickups</div>
-        </div>
-        <div class="stat-card" style="background: white; border: 1px solid var(--border-color);">
-            <div class="stat-number" style="color: #10b981;">{{ stats.completed_deliveries }}</div>
-            <div class="stat-label" style="color: var(--text-muted);">Completed Deliveries</div>
-        </div>
+        <p style="color: var(--text-muted);">You haven't posted any food donations yet.</p>
     {% endif %}
-</div>
 
-<!-- List Section -->
-<h2 style="font-size: 1.4rem; margin-bottom: 1rem;">
-    {% if current_user.role == 'donor' %}My Posted Food Donations{% else %}My Accepted Pickups{% endif %}
-</h2>
+<!-- NGO DASHBOARD VIEW -->
+{% elif current_user.role == 'ngo' %}
+    <!-- NGO Capacity Meter Card -->
+    <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 2rem; box-shadow: var(--shadow-sm);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <div>
+                <h3 style="font-size: 1.2rem; color: var(--text-main);">📊 Today's NGO Capacity Usage</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">Used capacity automatically updates as smart split allocations are assigned.</p>
+            </div>
+            <span class="badge {% if ngo.availability == 'Online' %}badge-available{% else %}badge-reserved{% endif %}" style="font-size: 0.9rem;">
+                Status: {{ ngo.availability }}
+            </span>
+        </div>
 
-{% if donations %}
-    <div style="background: white; border-radius: var(--radius-md); border: 1px solid var(--border-color); overflow: hidden; box-shadow: var(--shadow-sm);">
-        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem;">
-            <thead>
-                <tr style="background: var(--bg-main); border-bottom: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase;">
-                    <th style="padding: 1rem;">Food Item</th>
-                    <th style="padding: 1rem;">Quantity</th>
-                    <th style="padding: 1rem;">Location</th>
-                    <th style="padding: 1rem;">Status</th>
-                    <th style="padding: 1rem; text-align: right;">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in donations %}
-                    <tr style="border-bottom: 1px solid var(--border-color);">
-                        <td style="padding: 1rem;">
-                            <strong>{{ item.food_name }}</strong>
-                            <div style="font-size: 0.8rem; color: var(--text-muted);">{{ item.category }}</div>
-                        </td>
-                        <td style="padding: 1rem;">{{ item.quantity }}</td>
-                        <td style="padding: 1rem; color: var(--text-muted);">{{ item.location|truncate(35) }}</td>
-                        <td style="padding: 1rem;">
-                            {% if item.status == 'Available' %}
-                                <span class="badge badge-available">🟢 Available</span>
-                            {% elif item.status == 'Picked' %}
-                                <span class="badge badge-picked">🟡 Picked</span>
-                            {% else %}
-                                <span class="badge badge-delivered">🔵 Delivered</span>
-                            {% endif %}
-                        </td>
-                        <td style="padding: 1rem; text-align: right;">
-                            <a href="{{ url_for('donation_detail', donation_id=item.id) }}" class="btn btn-secondary btn-sm">
-                                View / Manage
-                            </a>
-                        </td>
+        <div class="capacity-meter" style="height: 16px; margin: 1rem 0;">
+            <div class="capacity-fill" style="width: {{ ((ngo.current_capacity_used or 0) / (ngo.daily_capacity or 500) * 100)|round }}%;"></div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-main);">
+            <span>Capacity Used: <strong>{{ ngo.current_capacity_used or 0 }} Meals</strong></span>
+            <span>Daily Limit: <strong>{{ ngo.daily_capacity or 500 }} Meals</strong></span>
+            <span>Max Per Pickup: <strong>{{ ngo.max_meals_per_pickup or 200 }} Meals</strong></span>
+        </div>
+    </div>
+
+    <!-- Assigned Split Allocations Table -->
+    <h2 style="font-size: 1.3rem; margin-bottom: 1rem;">🤖 My Assigned Smart Split Allocations</h2>
+    {% if allocations %}
+        <div class="table-responsive" style="margin-bottom: 2.5rem;">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Food Donation</th>
+                        <th>Allocated Quantity</th>
+                        <th>Donor</th>
+                        <th>Pickup Deadline</th>
+                        <th>Status</th>
+                        <th>Actions</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-{% else %}
-    <div style="text-align: center; padding: 3rem; background: white; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-        <p style="color: var(--text-muted); font-size: 1.05rem;">No items found in your dashboard yet.</p>
-        {% if current_user.role == 'donor' %}
-            <a href="{{ url_for('add_donation') }}" class="btn btn-primary btn-sm" style="margin-top: 0.75rem;">Post Your First Donation</a>
-        {% else %}
-            <a href="{{ url_for('donations') }}" class="btn btn-primary btn-sm" style="margin-top: 0.75rem;">Browse Available Food</a>
-        {% endif %}
-    </div>
+                </thead>
+                <tbody>
+                    {% for a in allocations %}
+                        <tr>
+                            <td><strong>{{ a.food_name }}</strong></td>
+                            <td><span style="font-weight: 700; color: var(--primary);">{{ a.allocated_quantity }} Meals</span></td>
+                            <td>{{ a.donor_org or a.donor_name }}</td>
+                            <td>{{ a.pickup_deadline }}</td>
+                            <td>
+                                <span class="badge badge-{{ a.status|lower|replace(' ', '') }}">
+                                    {{ a.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('donation_detail', donation_id=a.donation_id) }}" class="btn btn-secondary btn-sm">
+                                    View / Upload Proof &rarr;
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p style="color: var(--text-muted); margin-bottom: 2rem;">No smart split allocations currently assigned.</p>
+    {% endif %}
 {% endif %}
 {% endblock %}

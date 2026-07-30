@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}Log In - FoodBridge{% endblock %}
+{% block title %}Log In - FoodBridge MVP 2.0{% endblock %}
 
 {% block content %}
 <div class="form-card">
     <div style="text-align: center; margin-bottom: 2rem;">
         <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem;">Welcome Back</h1>
-        <p style="color: var(--text-muted);">Sign in to manage food donations or accept pickups.</p>
+        <p style="color: var(--text-muted);">Sign in to manage food donations, accept dispatches, or manage platform analytics.</p>
     </div>
 
     <!-- Quick Demo Accounts Banner for rapid testing -->
@@ -14,10 +14,13 @@
         <p style="font-size: 0.85rem; font-weight: 700; color: #047857; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px;">⚡ Quick Demo Login Credentials:</p>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
             <button type="button" class="btn btn-secondary btn-sm" onclick="fillDemo('donor@grandhotel.com', 'password123')">
-                🏨 Demo Donor (Grand Hotel)
+                🏨 Donor (Hotel)
             </button>
             <button type="button" class="btn btn-secondary btn-sm" onclick="fillDemo('ngo@foodcare.org', 'password123')">
-                🤝 Demo NGO (FoodCare)
+                🤝 NGO (FoodCare)
+            </button>
+            <button type="button" class="btn btn-secondary btn-sm" onclick="fillDemo('admin@foodbridge.org', 'password123')">
+                🛡️ Admin
             </button>
         </div>
     </div>

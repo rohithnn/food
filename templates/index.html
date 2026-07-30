@@ -1,132 +1,143 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
-{% block title %}FoodBridge - Zero Waste Food Donation Network{% endblock %}
+{% block title %}FoodBridge MVP 2.0 - Smart Automated Food Rescue Platform{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
 <section class="hero">
-    <h1 class="hero-title">Bridging <span>Surplus Food</span> to Hungry Hearts</h1>
-    <p class="hero-subtitle">
-        Connecting hotels, event planners, and restaurants with registered NGOs and local volunteers to eliminate food waste and ensure no meal goes to waste.
-    </p>
+    <h1 class="hero-title">Automating Food Rescue with <span>Smart NGO Matching</span></h1>
+    <p class="hero-subtitle">FoodBridge MVP 2.0 connects hotels, events, and caterers directly with nearby verified NGOs, automatically splitting bulk food donations based on real-time NGO capacity.</p>
 
     <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <a href="{{ url_for('donations') }}" class="btn btn-primary">
+            🍱 Browse Food Listings
+        </a>
         {% if current_user %}
-            {% if current_user.role == 'donor' %}
-                <a href="{{ url_for('add_donation') }}" class="btn btn-primary">+ Post Food Donation</a>
-            {% else %}
-                <a href="{{ url_for('donations') }}" class="btn btn-primary">Browse Available Food</a>
+            {% if current_user.role in ['donor', 'admin'] %}
+                <a href="{{ url_for('add_donation') }}" class="btn btn-secondary">
+                    + Post Food Donation
+                </a>
             {% endif %}
         {% else %}
-            <a href="{{ url_for('register') }}" class="btn btn-primary">Join as Donor or NGO</a>
-            <a href="{{ url_for('login') }}" class="btn btn-secondary" style="background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.3);">
-                Quick Demo Login
+            <a href="{{ url_for('register') }}" class="btn btn-secondary">
+                🚀 Join FoodBridge Platform
             </a>
         {% endif %}
     </div>
 
-    <!-- Real-time Impact Statistics Grid -->
+    <!-- Impact Counters Grid -->
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-number">{{ stats.total_donations }}</div>
-            <div class="stat-label">Total Meal Batches</div>
+            <div class="stat-number">{{ stats.total_meals_rescued }}</div>
+            <div class="stat-label">Meals Rescued</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number" style="color: #60a5fa;">{{ stats.available }}</div>
-            <div class="stat-label">Ready for Pickup</div>
+            <div class="stat-number">{{ stats.food_waste_prevented_kg }} kg</div>
+            <div class="stat-label">Food Waste Prevented</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number" style="color: #34d399;">{{ stats.delivered }}</div>
-            <div class="stat-label">Delivered Meals</div>
+            <div class="stat-number">{{ stats.ngos }}</div>
+            <div class="stat-label">Registered NGOs</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number" style="color: #fbbf24;">{{ stats.donors + stats.ngos }}</div>
-            <div class="stat-label">Donors & NGOs Connected</div>
+            <div class="stat-number">{{ stats.donors }}</div>
+            <div class="stat-label">Food Donors</div>
         </div>
     </div>
 </section>
 
-<!-- Active Food Listings Preview -->
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-    <div>
-        <h2>Available Food Near You</h2>
-        <p style="color: var(--text-muted); font-size: 0.95rem;">Freshly listed surplus meals awaiting NGO pickup acceptance.</p>
+<!-- MVP 2.0 Smart Features Showcase Grid -->
+<div style="margin-bottom: 3rem;">
+    <h2 style="font-size: 1.6rem; color: var(--text-main); margin-bottom: 0.5rem; text-align: center;">⚡ MVP 2.0 Automated Capabilities</h2>
+    <p style="color: var(--text-muted); text-align: center; margin-bottom: 2rem;">Designed to eliminate food waste seamlessly through intelligent automation.</p>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;">
+        <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🤖</div>
+            <h3 style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 0.4rem;">Smart Capacity Auto-Splitting</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted);">Bulk food (e.g. 500 meals) is automatically divided among nearby NGOs according to each NGO's daily meal limits.</p>
+        </div>
+
+        <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📍</div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <h3 style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 0.4rem;">Nearby NGO Radius Match</h3>
+            </div>
+            <p style="font-size: 0.88rem; color: var(--text-muted);">Geospatial Haversine calculation matches active online NGOs within their configured service radius (e.g. 10 km).</p>
+        </div>
+
+        <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📱</div>
+            <h3 style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 0.4rem;">Email & WhatsApp Alerts</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted);">Instant dispatch alerts with quantity, deadline, location link, and one-click accept URLs sent directly to matched NGOs.</p>
+        </div>
+
+        <div style="background: white; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem; box-shadow: var(--shadow-sm);">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📷</div>
+            <h3 style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 0.4rem;">Pickup & Delivery Proof</h3>
+            <p style="font-size: 0.88rem; color: var(--text-muted);">Mandatory photo upload for pickup and delivery dispatches with automatic timestamp verification for full accountability.</p>
+        </div>
     </div>
-    <a href="{{ url_for('donations') }}" class="btn btn-secondary btn-sm">View All Food →</a>
 </div>
 
-{% if recent_donations %}
+<!-- Active Surplus Food Donations Section -->
+<div style="margin-bottom: 3rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <h2 style="font-size: 1.6rem; color: var(--text-main);">🟢 Active Surplus Food Listings</h2>
+            <p style="color: var(--text-muted);">Real-time available donations needing pickup dispatches.</p>
+        </div>
+        <a href="{{ url_for('donations') }}" class="btn btn-secondary btn-sm">View All Listings &rarr;</a>
+    </div>
+
     <div class="card-grid">
         {% for item in recent_donations %}
             <div class="donation-card">
                 <div>
                     <div class="card-header">
-                        <span class="card-category">{{ item.category }}</span>
-                        <span class="badge badge-available">
-                            <span class="pulse-dot"></span> Available
+                        <div>
+                            <span class="card-category">{{ item.category }}</span>
+                            <span class="badge {% if item.food_type == 'Veg' %}badge-veg{% else %}badge-nonveg{% endif %}" style="margin-left: 0.3rem;">
+                                {% if item.food_type == 'Veg' %}🌱 Veg{% else %}🍗 Non-Veg{% endif %}
+                            </span>
+                        </div>
+                        <span class="badge badge-{{ item.status|lower|replace(' ', '') }}">
+                            <span class="pulse-dot"></span> {{ item.status }}
                         </span>
                     </div>
 
                     <h3 class="card-title">{{ item.food_name }}</h3>
-                    
+
                     <div style="margin: 0.85rem 0;">
                         <div class="card-info-item">
-                            <span class="card-info-icon">📦</span>
-                            <span><strong>Quantity:</strong> {{ item.quantity }}</span>
+                            <span class="card-info-icon">🍱</span>
+                            <span><strong>{{ item.quantity }}</strong> ({{ item.servings_count or 50 }} Servings)</span>
                         </div>
                         <div class="card-info-item">
                             <span class="card-info-icon">📍</span>
-                            <span><strong>Location:</strong> {{ item.location }}</span>
+                            <span>{{ item.location }}</span>
                         </div>
                         <div class="card-info-item">
-                            <span class="card-info-icon">⏳</span>
-                            <span><strong>Expiry:</strong> {{ item.expiry_time }}</span>
+                            <span class="card-info-icon">🕒</span>
+                            <span>Deadline: <strong>{{ item.pickup_deadline }}</strong></span>
                         </div>
                     </div>
                 </div>
 
                 <div class="card-footer">
                     <div class="donor-info">
-                        Donor: <strong>{{ item.donor_org or item.donor_name }}</strong>
+                        Posted by:<br>
+                        <strong>{{ item.donor_org or item.donor_name }}</strong>
                     </div>
-                    <a href="{{ url_for('donation_detail', donation_id=item.id) }}" class="btn btn-primary btn-sm">
-                        View & Claim
+
+                    <a href="{{ url_for('donation_detail', donation_id=item.id) }}" class="btn btn-secondary btn-sm">
+                        View Details &rarr;
                     </a>
                 </div>
             </div>
+        {% else %}
+            <p style="color: var(--text-muted);">No active food listings right now.</p>
         {% endfor %}
     </div>
-{% else %}
-    <div style="text-align: center; padding: 3rem; background: white; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-        <p style="font-size: 1.1rem; color: var(--text-muted);">No active food donations right now.</p>
-        {% if current_user and current_user.role == 'donor' %}
-            <a href="{{ url_for('add_donation') }}" class="btn btn-primary" style="margin-top: 1rem;">Post the First Donation</a>
-        {% endif %}
-    </div>
-{% endif %}
-
-<!-- How It Works Section -->
-<section style="margin-top: 4rem; padding-top: 2.5rem; border-top: 1px solid var(--border-color);">
-    <h2 style="text-align: center; margin-bottom: 2rem;">How FoodBridge Works</h2>
-    
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
-        <div style="background: white; padding: 1.75rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); text-align: center;">
-            <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🏨</div>
-            <h3 style="margin-bottom: 0.5rem;">1. Donor Posts Food</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">Hotels, restaurants, or event organizers post excess untouched food with location, quantity, and expiry details.</p>
-        </div>
-        
-        <div style="background: white; padding: 1.75rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); text-align: center;">
-            <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🛵</div>
-            <h3 style="margin-bottom: 0.5rem;">2. NGO Accepts Pickup</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">Nearby NGOs or volunteers browse live listings, claim items, and view interactive maps to pick up food promptly.</p>
-        </div>
-        
-        <div style="background: white; padding: 1.75rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); text-align: center;">
-            <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">🍲</div>
-            <h3 style="margin-bottom: 0.5rem;">3. Status Tracked & Delivered</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem;">Real-time status updates ensure transparency from Available to Picked to Delivered to community shelters.</p>
-        </div>
-    </div>
-</section>
+</div>
 {% endblock %}

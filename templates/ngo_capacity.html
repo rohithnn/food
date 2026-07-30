@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}NGO Capacity & Location Configuration - FoodBridge MVP 2.0{% endblock %}
+
+{% block content %}
+<div class="form-card" style="max-width: 800px;">
+    <div style="margin-bottom: 1.5rem; text-align: center;">
+        <h1 style="font-size: 1.8rem; color: var(--text-main);">📊 NGO Capacity & Location Settings</h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">Configure your daily meal capacity, pickup limit, online availability, and location radius for smart food distribution auto-matching.</p>
+    </div>
+
+    <!-- Current Capacity Status Card -->
+    <div style="background: var(--bg-main); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <strong style="color: var(--text-main);">Daily Meal Capacity Usage</strong>
+            <span style="font-weight: 700; color: var(--primary);">
+                {{ ngo.current_capacity_used or 0 }} / {{ ngo.daily_capacity or 500 }} Meals
+            </span>
+        </div>
+        <div class="capacity-meter" style="height: 14px;">
+            <div class="capacity-fill" style="width: {{ ((ngo.current_capacity_used or 0) / (ngo.daily_capacity or 500) * 100)|round }}%;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">
+            <span>Remaining Today: <strong>{{ (ngo.daily_capacity or 500) - (ngo.current_capacity_used or 0) }} Meals</strong></span>
+            <span>Status: <strong style="color: {% if ngo.availability == 'Online' %}var(--primary){% else %}var(--text-muted){% endif %};">{{ ngo.availability }}</strong></span>
+        </div>
+    </div>
+
+    <form method="POST" action="{{ url_for('ngo_capacity') }}">
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="daily_capacity">Daily Maximum Capacity (Meals)</label>
+                <input type="number" id="daily_capacity" name="daily_capacity" class="form-control" value="{{ ngo.daily_capacity or 500 }}" required min="10" max="5000">
+                <small style="color: var(--text-muted);">Total meals your NGO can accept per day.</small>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="max_meals_per_pickup">Maximum Meals Per Pickup</label>
+                <input type="number" id="max_meals_per_pickup" name="max_meals_per_pickup" class="form-control" value="{{ ngo.max_meals_per_pickup or 200 }}" required min="5" max="1000">
+                <small style="color: var(--text-muted);">Maximum food allocation in a single pickup dispatch.</small>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label" for="availability">Availability Status</label>
+                <select id="availability" name="availability" class="form-control">
+                    <option value="Online" {% if ngo.availability == 'Online' %}selected{% endif %}>🟢 Online (Ready to receive food matching)</option>
+                    <option value="Offline" {% if ngo.availability == 'Offline' %}selected{% endif %}>🔴 Offline (Currently unavailable)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="service_radius_km">Service Radius (Kilometers)</label>
+                <input type="number" step="0.5" id="service_radius_km" name="service_radius_km" class="form-control" value="{{ ngo.service_radius_km or 10.0 }}" required min="1" max="100">
+                <small style="color: var(--text-muted);">Maximum distance you can travel for pickup dispatches.</small>
+            </div>
+        </div>
+
+        <!-- Location Pin Selector Map -->
+        <div class="form-group">
+            <label class="form-label">NGO Location Pin (Coordinates)</label>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">Click on the map to set your precise NGO operational headquarters location.</p>
+            
+            <div id="picker-map" class="picker-map"></div>
+            
+            <div class="form-row" style="margin-top: 0.75rem;">
+                <div>
+                    <label class="form-label" for="latitude" style="font-size: 0.8rem;">Latitude</label>
+                    <input type="text" id="latitude" name="latitude" class="form-control" value="{{ ngo.latitude or 12.9716 }}" readonly>
+                </div>
+                <div>
+                    <label class="form-label" for="longitude" style="font-size: 0.8rem;">Longitude</label>
+                    <input type="text" id="longitude" name="longitude" class="form-control" value="{{ ngo.longitude or 77.5946 }}" readonly>
+                </div>
+            </div>
+        </div>
+
+        <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: var(--radius-sm); padding: 0.85rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+            <span style="font-size: 1.3rem;">🔄</span>
+            <div>
+                <strong style="color: #065f46; font-size: 0.9rem;">Daily Auto-Reset Active</strong>
+                <p style="font-size: 0.82rem; color: #047857; margin-top: 0.1rem;">
+                    Your <em>capacity used</em> counter automatically resets to <strong>0</strong> every day at the start of a new day — no manual action required.
+                </p>
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 1rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 1;">Save Capacity Settings</button>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const defaultLat = parseFloat(document.getElementById('latitude').value) || 12.9716;
+    const defaultLng = parseFloat(document.getElementById('longitude').value) || 77.5946;
+
+    const map = L.map('picker-map').setView([defaultLat, defaultLng], 13);
+    
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    let marker = L.marker([defaultLat, defaultLng], { draggable: true }).addTo(map);
+
+    function updateCoords(lat, lng) {
+        document.getElementById('latitude').value = lat.toFixed(6);
+        document.getElementById('longitude').value = lng.toFixed(6);
+    }
+
+    marker.on('dragend', function(e) {
+        const coord = e.target.getLatLng();
+        updateCoords(coord.lat, coord.lng);
+    });
+
+    map.on('click', function(e) {
+        marker.setLatLng(e.latlng);
+        updateCoords(e.latlng.lat, e.latlng.lng);
+    });
+});
+</script>
+{% endblock %}

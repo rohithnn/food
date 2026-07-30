@@ -1,27 +1,32 @@
 {% extends 'base.html' %}
 
-{% block title %}Register Account - FoodBridge{% endblock %}
+{% block title %}Register Account - FoodBridge MVP 2.0{% endblock %}
 
 {% block content %}
 <div class="form-card">
     <div style="text-align: center; margin-bottom: 2rem;">
-        <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem;">Join FoodBridge</h1>
-        <p style="color: var(--text-muted);">Create your account to start donating or receiving surplus food.</p>
+        <h1 style="font-size: 1.8rem; margin-bottom: 0.5rem;">Join FoodBridge MVP 2.0</h1>
+        <p style="color: var(--text-muted);">Create your account to start donating, accepting dispatches, or managing platform operations.</p>
     </div>
 
     <form action="{{ url_for('register') }}" method="POST">
         <div class="form-group">
             <label class="form-label">I am joining as a:</label>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <label style="border: 2px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; cursor: pointer; text-align: center; display: block;" id="role-donor-box">
-                    <input type="radio" name="role" value="donor" checked style="margin-right: 0.4rem;" onchange="updateRoleHighlight()">
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem;">
+                <label style="border: 2px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; cursor: pointer; text-align: center; display: block;" id="role-donor-box">
+                    <input type="radio" name="role" value="donor" checked style="margin-right: 0.3rem;" onchange="updateRoleHighlight()">
                     <strong>🏨 Donor</strong>
-                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Hotel, Restaurant, Event</div>
+                    <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">Hotel, Event</div>
                 </label>
-                <label style="border: 2px solid var(--border-color); border-radius: var(--radius-md); padding: 0.85rem; cursor: pointer; text-align: center; display: block;" id="role-ngo-box">
-                    <input type="radio" name="role" value="ngo" style="margin-right: 0.4rem;" onchange="updateRoleHighlight()">
-                    <strong>🤝 NGO / Volunteer</strong>
-                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Shelter, Welfare Trust</div>
+                <label style="border: 2px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; cursor: pointer; text-align: center; display: block;" id="role-ngo-box">
+                    <input type="radio" name="role" value="ngo" style="margin-right: 0.3rem;" onchange="updateRoleHighlight()">
+                    <strong>🤝 NGO</strong>
+                    <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">Shelter, Trust</div>
+                </label>
+                <label style="border: 2px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; cursor: pointer; text-align: center; display: block;" id="role-admin-box">
+                    <input type="radio" name="role" value="admin" style="margin-right: 0.3rem;" onchange="updateRoleHighlight()">
+                    <strong>🛡️ Admin</strong>
+                    <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.2rem;">System Operator</div>
                 </label>
             </div>
         </div>
@@ -48,6 +53,25 @@
             </div>
         </div>
 
+        <!-- NGO Capacity Fields (Shown if NGO selected) -->
+        <div id="ngo-capacity-fields" style="display: none; background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.25rem;">
+            <h4 style="font-size: 0.95rem; color: var(--text-main); margin-bottom: 0.85rem;">📊 Initial NGO Capacity Configuration</h4>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="daily_capacity">Daily Meal Capacity</label>
+                    <input type="number" id="daily_capacity" name="daily_capacity" class="form-control" value="500">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="max_meals_per_pickup">Max Meals Per Pickup</label>
+                    <input type="number" id="max_meals_per_pickup" name="max_meals_per_pickup" class="form-control" value="200">
+                </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+                <label class="form-label" for="service_radius_km">Service Radius (km)</label>
+                <input type="number" step="0.5" id="service_radius_km" name="service_radius_km" class="form-control" value="10.0">
+            </div>
+        </div>
+
         <div class="form-group">
             <label class="form-label" for="password">Password</label>
             <input type="password" id="password" name="password" class="form-control" placeholder="At least 6 characters" minlength="6" required>
@@ -65,21 +89,22 @@
 
 <script>
 function updateRoleHighlight() {
-    const isDonor = document.querySelector('input[name="role"]:checked').value === 'donor';
+    const roleVal = document.querySelector('input[name="role"]:checked').value;
     const donorBox = document.getElementById('role-donor-box');
     const ngoBox = document.getElementById('role-ngo-box');
+    const adminBox = document.getElementById('role-admin-box');
+    const ngoFields = document.getElementById('ngo-capacity-fields');
     
-    if (isDonor) {
-        donorBox.style.borderColor = 'var(--primary)';
-        donorBox.style.backgroundColor = 'var(--primary-light)';
-        ngoBox.style.borderColor = 'var(--border-color)';
-        ngoBox.style.backgroundColor = 'white';
-    } else {
-        ngoBox.style.borderColor = 'var(--secondary)';
-        ngoBox.style.backgroundColor = '#e0e7ff';
-        donorBox.style.borderColor = 'var(--border-color)';
-        donorBox.style.backgroundColor = 'white';
-    }
+    donorBox.style.borderColor = roleVal === 'donor' ? 'var(--primary)' : 'var(--border-color)';
+    donorBox.style.backgroundColor = roleVal === 'donor' ? 'var(--primary-light)' : 'white';
+
+    ngoBox.style.borderColor = roleVal === 'ngo' ? 'var(--secondary)' : 'var(--border-color)';
+    ngoBox.style.backgroundColor = roleVal === 'ngo' ? '#e0e7ff' : 'white';
+
+    adminBox.style.borderColor = roleVal === 'admin' ? '#f59e0b' : 'var(--border-color)';
+    adminBox.style.backgroundColor = roleVal === 'admin' ? '#fef3c7' : 'white';
+
+    ngoFields.style.display = roleVal === 'ngo' ? 'block' : 'none';
 }
 updateRoleHighlight();
 </script>

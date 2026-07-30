@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Notification Center - FoodBridge MVP 2.0{% endblock %}
+
+{% block content %}
+<div style="max-width: 800px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div>
+            <h1 style="font-size: 1.8rem; color: var(--text-main);">🔔 Notification Center</h1>
+            <p style="color: var(--text-muted);">Real-time alerts for donations, auto-match allocations, pickup status, and expiry warnings.</p>
+        </div>
+        {% if notifications %}
+            <form method="POST" action="{{ url_for('api_read_notifications') }}">
+                <button type="submit" class="btn btn-secondary btn-sm">Mark All as Read</button>
+            </form>
+        {% endif %}
+    </div>
+
+    {% if notifications %}
+        <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+            {% for n in notifications %}
+                <div class="notif-item {% if not n.is_read %}unread{% endif %}">
+                    <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                        <div style="font-size: 1.5rem; margin-top: 0.1rem;">
+                            {% if n.type == 'success' %}✅
+                            {% elif n.type == 'urgent' or n.type == 'danger' %}🚨
+                            {% elif n.type == 'warning' %}🔔
+                            {% else %}ℹ️{% endif %}
+                        </div>
+                        <div>
+                            <h4 style="font-size: 1rem; color: var(--text-main); margin-bottom: 0.25rem;">{{ n.title }}</h4>
+                            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">{{ n.message }}</p>
+                            <div style="display: flex; gap: 1rem; align-items: center; font-size: 0.8rem; color: var(--text-light);">
+                                <span>🕒 {{ n.created_at }}</span>
+                                {% if n.link and n.link != '#' %}
+                                    <a href="{{ n.link }}" style="color: var(--primary); font-weight: 600;">View Details &rarr;</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div style="text-align: center; padding: 4rem 2rem; background: white; border-radius: var(--radius-lg); border: 1px solid var(--border-color);">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🔕</div>
+            <h3 style="color: var(--text-main);">No Notifications Yet</h3>
+            <p style="color: var(--text-muted);">You will receive real-time notifications here when food dispatches or auto-matches occur.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

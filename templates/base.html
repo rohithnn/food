@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}FoodBridge - Connecting Surplus Food with Communities{% endblock %}</title>
+    <title>{% block title %}FoodBridge MVP 2.0 - Automated Food Rescue & Distribution Platform{% endblock %}</title>
     
     <!-- Custom Design System Stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     
     <!-- Leaflet.js Interactive Maps CSS (Free OpenStreetMap) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+    
+    <!-- Chart.js for Admin Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -17,7 +20,7 @@
     <nav class="navbar">
         <a href="{{ url_for('index') }}" class="nav-brand">
             <div class="nav-brand-icon">🌱</div>
-            <span>FoodBridge</span>
+            <span>FoodBridge <small style="font-size: 0.65rem; color: var(--primary); background: var(--primary-light); padding: 0.1rem 0.4rem; border-radius: 4px;">MVP 2.0</small></span>
         </a>
 
         <ul class="nav-menu">
@@ -26,10 +29,19 @@
             
             {% if current_user %}
                 <li><a href="{{ url_for('dashboard') }}" class="nav-link">Dashboard</a></li>
-                {% if current_user.role == 'donor' %}
+                
+                {% if current_user.role == 'admin' %}
+                    <li><a href="{{ url_for('admin_dashboard') }}" class="nav-link" style="color: #b45309; font-weight: 700;">⚙️ Admin</a></li>
+                {% endif %}
+
+                {% if current_user.role == 'ngo' %}
+                    <li><a href="{{ url_for('ngo_capacity') }}" class="nav-link">📊 NGO Capacity</a></li>
+                {% endif %}
+
+                {% if current_user.role in ['donor', 'admin'] %}
                     <li>
                         <a href="{{ url_for('add_donation') }}" class="btn btn-primary btn-sm">
-                            + Donate Food
+                            + Post Food Donation
                         </a>
                     </li>
                 {% endif %}
@@ -38,6 +50,14 @@
 
         <div class="nav-user">
             {% if current_user %}
+                <!-- In-App Notification Bell -->
+                <a href="{{ url_for('notifications_view') }}" class="notif-bell" title="Notifications">
+                    🔔
+                    {% if unread_notifications_count > 0 %}
+                        <span class="notif-badge">{{ unread_notifications_count }}</span>
+                    {% endif %}
+                </a>
+
                 <div class="user-badge">
                     <span>{{ current_user.name }}</span>
                     <span class="user-role-tag role-{{ current_user.role }}">
@@ -78,8 +98,8 @@
 
     <!-- Footer -->
     <footer class="footer">
-        <p>© {{ 2026 }} <strong>FoodBridge</strong>. Reducing food waste & nourishing communities.</p>
-        <p style="margin-top: 0.25rem; font-size: 0.8rem; color: var(--text-light);">Built with Python Flask & SQLite.</p>
+        <p>© 2026 <strong>FoodBridge MVP 2.0</strong>. Smart, Automated Food Distribution & Waste Prevention.</p>
+        <p style="margin-top: 0.25rem; font-size: 0.8rem; color: var(--text-light);">Multi-Role Auth • Smart Capacity Splitting • Email & WhatsApp Alerts • Live Maps</p>
     </footer>
 
     <!-- Leaflet.js JS library -->
